@@ -111,10 +111,10 @@ function JobPortal() {
         </div>
 
         <nav className="nav">
-          <a href="#">Find Jobs</a>
-          <a href="#">Companies</a>
-          <a href="#">Candidates</a>
-          <a href="#">Pricing</a>
+          <a href="/">Find Jobs</a>
+          <a href="/companies">Companies</a>
+          <a href="/candidates">Candidates</a>
+          <a href="/pricing">Pricing</a>
         </nav>
 
         <div className="top-actions">
