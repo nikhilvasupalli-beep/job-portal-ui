@@ -29,6 +29,7 @@ function JobPortal() {
   const [jobs, setJobs] = useState(() => getStoredJobs());
   const [form, setForm] = useState(emptyForm);
   const [darkMode, setDarkMode] = useState(false);
+  const [appliedJobs, setAppliedJobs] = useState([]);
 
   useEffect(() => {
     const loadJobs = async () => {
@@ -99,29 +100,32 @@ function JobPortal() {
     saveJobs(nextJobs);
   };
 
+  const companies = [...new Set(jobs.map(job => job.company).filter(Boolean))];
+  const candidates = jobs.filter(job => job.name);
+
   return (
     <div className={`job-app ${darkMode ? "dark-mode" : ""}`}>
       <header className="topbar">
         <div className="brand-wrap">
-          <div className="brand-mark">H</div>
+          <div className="brand-mark">C</div>
           <div>
-            <div className="brand-name">HireFlow</div>
+            <div className="brand-name">Career Connect</div>
             <div className="brand-subtitle">Career Platform</div>
           </div>
         </div>
 
         <nav className="nav">
-          <a href="/">Find Jobs</a>
-          <a href="/companies">Companies</a>
-          <a href="/candidates">Candidates</a>
-          <a href="/pricing">Pricing</a>
+          <a href="#jobs">Find Jobs</a>
+          <a href="#companies">Companies</a>
+          <a href="#candidates">Candidates</a>
+          <a href="#pricing">Pricing</a>
         </nav>
 
         <div className="top-actions">
           <button type="button" className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
             {darkMode ? "Light mode" : "Dark mode"}
           </button>
-          <button type="button" className="signin-btn">Sign in</button>
+          <a className="signin-btn" href="#candidates">Candidate profile</a>
         </div>
       </header>
 
@@ -136,8 +140,8 @@ function JobPortal() {
             </p>
 
             <div className="hero-actions">
-              <button type="button" className="primary-btn">Explore jobs</button>
-              <button type="button" className="secondary-btn">Post a job</button>
+              <a className="primary-btn" href="#jobs">Explore jobs</a>
+              <a className="secondary-btn" href="#post-job">Post a job</a>
             </div>
 
             <div className="hero-metrics">
@@ -183,7 +187,7 @@ function JobPortal() {
           </div>
         </section>
 
-        <section className="dashboard-panel">
+        <section className="dashboard-panel" id="post-job">
           <div className="panel-header">
             <h2>Post a job opportunity</h2>
             <span>{jobs.length} roles available</span>
@@ -199,15 +203,15 @@ function JobPortal() {
           </div>
         </section>
 
-        <section className="results-header">
+        <section className="results-header" id="jobs">
           <div>
             <span className="section-kicker">Recommended roles</span>
             <h2>Fresh opportunities</h2>
           </div>
-          <button type="button" className="filter-btn">View all</button>
+          <a className="filter-btn" href="#job-list">View all</a>
         </section>
 
-        <div className="grid">
+        <div className="grid" id="job-list">
           {jobs.length === 0 ? (
             <div className="empty-state">No jobs added yet. Start by publishing a new opportunity.</div>
           ) : (
@@ -224,13 +228,70 @@ function JobPortal() {
                 <p>₹ {job.salary}</p>
 
                 <div className="card-actions">
-                  <button type="button" className="apply-btn">Apply now</button>
+                  <button
+                    type="button"
+                    className="apply-btn"
+                    disabled={appliedJobs.includes(job.id)}
+                    onClick={() => setAppliedJobs([...appliedJobs, job.id])}
+                  >
+                    {appliedJobs.includes(job.id) ? "Applied" : "Apply now"}
+                  </button>
                   <button type="button" className="delete-btn" onClick={() => deleteJob(job.id)}>Delete</button>
                 </div>
               </div>
             ))
           )}
         </div>
+
+        <section className="directory-section" id="companies">
+          <div className="section-heading">
+            <span className="section-kicker">Explore employers</span>
+            <h2>Companies hiring</h2>
+          </div>
+          {companies.length ? (
+            <div className="directory-list">
+              {companies.map(company => (
+                <a className="directory-item" href="#job-list" key={company}>
+                  <span className="directory-icon">{company.charAt(0).toUpperCase()}</span>
+                  <span>{company}</span>
+                  <span className="directory-arrow" aria-hidden="true">&#8599;</span>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p className="section-empty">Company listings will appear here when jobs are posted.</p>
+          )}
+        </section>
+
+        <section className="directory-section" id="candidates">
+          <div className="section-heading">
+            <span className="section-kicker">Meet the talent</span>
+            <h2>Candidate profiles</h2>
+          </div>
+          {candidates.length ? (
+            <div className="directory-list">
+              {candidates.map(candidate => (
+                <a className="directory-item" href="#post-job" key={candidate.id}>
+                  <span className="directory-icon">{candidate.name.charAt(0).toUpperCase()}</span>
+                  <span>{candidate.name}</span>
+                  <span className="directory-detail">{candidate.title}</span>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p className="section-empty">Add a candidate name in the job form to feature a profile here.</p>
+          )}
+          <a className="secondary-btn section-action" href="#post-job">Create a profile</a>
+        </section>
+
+        <section className="directory-section pricing-section" id="pricing">
+          <div className="section-heading">
+            <span className="section-kicker">Straightforward access</span>
+            <h2>Simple, free job discovery</h2>
+          </div>
+          <p className="section-empty">Browse roles, explore companies, and publish opportunities at no cost.</p>
+          <a className="primary-btn section-action" href="#jobs">Browse jobs</a>
+        </section>
       </main>
     </div>
   );

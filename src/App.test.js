@@ -6,6 +6,24 @@ describe('JobPortal', () => {
     window.localStorage.clear();
   });
 
+  test('shows Career Connect and working navigation destinations', () => {
+    global.fetch = jest.fn(() => Promise.reject(new Error('Failed to fetch')));
+
+    render(<JobPortal />);
+
+    expect(screen.getByText('Career Connect')).toBeInTheDocument();
+
+    [
+      ['Find Jobs', 'jobs'],
+      ['Companies', 'companies'],
+      ['Candidates', 'candidates'],
+      ['Pricing', 'pricing']
+    ].forEach(([label, target]) => {
+      expect(screen.getByRole('link', { name: label })).toHaveAttribute('href', `#${target}`);
+      expect(document.getElementById(target)).toBeInTheDocument();
+    });
+  });
+
   test('adds a job locally when the backend fetch fails', async () => {
     global.fetch = jest.fn(() => Promise.reject(new Error('Failed to fetch')));
 
@@ -29,7 +47,7 @@ describe('JobPortal', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /add job/i }));
 
-    expect(await screen.findByText(/Software Engineer/i)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Software Engineer/i })).toBeInTheDocument();
     expect(JSON.parse(window.localStorage.getItem('jobPortalJobs') || '[]')).toHaveLength(1);
   });
 });
